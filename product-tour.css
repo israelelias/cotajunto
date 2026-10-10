@@ -5,6 +5,8 @@
 .pt-panel { position: fixed; display: flex; flex-direction: column; padding: 18px; gap: 10px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 12px 48px #0004; pointer-events: auto; overflow-wrap: anywhere; }
 .pt-kicker { color: var(--green); font-weight: 700; font-size: 11px; letter-spacing: .4px; }
 .pt-panel h2 { font-size: 19px; line-height: 1.25; letter-spacing: -.3px; }
+.pt-panel h2, .pt-kicker { flex-shrink: 0; }
+#product-tour-root[data-preparing="true"] :is(.pt-panel,.pt-ring) { visibility: hidden; }
 .pt-description { overflow-y: auto; overscroll-behavior: contain; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
 .pt-description p { font-size: 13px; line-height: 1.55; color: var(--muted); }
 .pt-description p + p { margin-top: 8px; }

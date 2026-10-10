@@ -1,3 +1,50 @@
+# Posicionamento responsivo e navegação automática — etapa 2.3
+
+Implementação em **10 de outubro de 2026**, sobre a versão existente da etapa 2.2. Mantidos integralmente os **62 passos**, títulos, textos, ordem, perfis, rotas, condições de avanço, cenário conectado e persistência. README, identidade visual e dados financeiros fictícios preservados.
+
+## Fontes utilizadas
+
+Os dois caminhos indicados em `Desktop/Modelos` não continham os anexos nesta execução. Foram localizados, na pasta da disciplina, o relato correspondente em **Lista de Ajustes a Fazer no Aplicativo - 7.md**, com **cinco capturas de tela**, e a especificação **2.3. Corrigir o posicionamento responsivo e a navegação automática do guia interativo no mobile.md**. O relato e todas as imagens foram examinados primeiro; depois, as 31 seções da especificação foram lidas integralmente. Não foi possível conferir o PDF original ausente. A lista posterior de novos efeitos visuais não faz parte desta entrega.
+
+## Causas corrigidas
+
+O cálculo anterior escolhia a região inferior como padrão no mobile. Além disso, a função que buscava um link da navegação retornava o botão hambúrguer quando o menu estava recolhido. Por isso o guia destacava o controle intermediário e dependia de sua abertura manual.
+
+Agora o guia resolve sempre o alvo real. O posicionamento avalia a geometria desse alvo, o painel, a viewport visual, cabeçalho fixo, navegação e margens. A necessidade de abrir o menu depende de o alvo pertencer à navegação recolhida; não há regras por número de passo ou por texto.
+
+## Critérios atendidos
+
+| Requisito | Implementação |
+| --- | --- |
+| Painel contextual no mobile e desktop | Compara espaço acima, abaixo e nas duas laterais; mantém proximidade e margens de segurança. |
+| Pouco espaço ou textos longos | Ajusta largura/altura, mantém título e ações acessíveis e permite rolagem interna da descrição com a indicação existente. |
+| Fallback | Compartilha a área útil entre o painel compacto e a porção visível do alvo somente quando o conjunto não cabe nos lados disponíveis. |
+| Rolagem automática | Considera cabeçalho e área do painel. Em cards/formulários altos, prioriza o campo editável ou o controle em foco, sem abrir o teclado automaticamente. |
+| Interação | Campo, botão ou link necessário continua utilizável; ring e sombras usam a mesma geometria final do painel. |
+| Atualizações de layout | Recalcula por scroll, resize, visualViewport, foco, carregamento e ResizeObserver; agrupa medições em requestAnimationFrame. |
+| Menu automático | Detecta ancestral `.sidebar` e estado recolhido, abre pelo mesmo controlador do hambúrguer e aguarda a transição real e dois frames antes do destaque. Também aguarda o fechamento que possa encobrir o próximo alvo. |
+| Menu em passos consecutivos | Mantém aberto ao navegar para outra etapa que também depende dele, sem ciclo de fechar/reabrir. |
+| Estado anterior | Registra em memória se a abertura foi feita pelo guia. Fecha o menu aberto pelo guia quando dispensável ou ao sair; preserva um menu que já estava aberto pelo usuário. A navegação livre mantém seu fechamento normal ao mudar de página. |
+| Dois perfis | Aplica a mesma regra aos links efetivamente presentes no menu do Cliente ou do Colaborador. |
+| Sincronização | Reconsulta o alvo depois da transição; enquanto ela ocorre, não apresenta painel/ring em coordenadas intermediárias. |
+| Desktop | Navegação permanente não é aberta artificialmente; o painel aproveita o espaço lateral quando disponível. |
+| Acessibilidade | Mantidos teclado, Escape, atributos semânticos, botões de saída, preferência de movimento reduzido e leitura com zoom. |
+| Preservação funcional | Sem alterações nas regras de coleta, chat, ajuste, aprovação, recompensa, avaliação, armazenamento ou numeração. |
+| Publicação | Continua HTML/CSS/JavaScript estático, sem novas bibliotecas, backend ou serviços externos. |
+
+## Arquivos modificados
+
+- `product-tour.js`: posicionamento adaptativo, revelação do alvo, observação da geometria e preparação/restauração do menu.
+- `product-tour.css`: impede encolhimento do título/indicador e evita exibir destaque enquanto a navegação está em transição.
+- `app.js`: controlador compartilhado do menu e integração com as transições do guia.
+- `ALTERACOES.md` e `VALIDACAO.md`: registro desta entrega e dos testes, preservando o histórico.
+
+A extração do controlador do menu foi necessária para usar o estado real do aplicativo. Abrir/fechar o menu agora atualiza seus próprios elementos, sem reconstruir a página ou perder campos em edição. Não foram adicionados passos, funcionalidades de negócio, dependências nem alterações no README.
+
+O pacote de publicação mantém os mesmos 11 arquivos. A versão pública do GitHub Pages só será atualizada quando esses arquivos forem enviados ao repositório.
+
+---
+
 # Fluxo, numeração e transições do Product Tour — etapa 2.2
 
 Implementação concluída em **9 de outubro de 2026**, sobre a versão existente da etapa 2.1. O PDF de observações foi lido primeiro, incluindo as capturas das sete páginas; depois, foi lida a especificação completa da etapa 2.2. O README não foi modificado.

@@ -9,6 +9,9 @@
   const fresh = () => ({version:1,status:'new',runId:null,step:'client-access',demoRequestId:null,clientId:'client',workerId:'worker',owner:null,formDraft:{},arrival:null});
   let tour = fresh(), host, root, frame, target, panelKey='', exitPrompt=false, takeoverDismissed=false, storageOK=true;
   let lastTarget, lastStep, restoreRoot, restoreKey='', missingReason='';
+  let menuLease=null, menuWait=null, geometryFrame=null, revealTarget=false;
+  const geometryObserver=new ResizeObserver(()=>scheduleLayout());
+  let observedGeometry=[];
   const inertNodes = new Map();
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const paragraphs = text => text.split('\n\n').map((part,i,parts)=>`<p${i===parts.length-1?' class="pt-instruction"':''}>${esc(part)}</p>`).join('');
@@ -21,10 +24,7 @@
   const at = expected => s => s.route === (typeof expected==='function'?expected():expected);
   const byAction = action => `[data-action="${action}"]`;
   const requestLink = prefix => () => [...document.querySelectorAll('a.request-card')].find(a=>a.getAttribute('href')===`#/${prefix}/${tour.demoRequestId}`);
-  const nav = href => () => {
-    const sidebar=q('.sidebar');
-    return matchMedia('(max-width:740px)').matches&&!sidebar?.classList.contains('open') ? q('.menu-toggle') : q(`.nav a[href="#/${href}"]`);
-  };
+  const nav = href => () => q(`.nav a[href="#/${href}"]`);
   const itemTarget = predicate => s => {
     const item=req(s)?.items.find(predicate);
     return item ? q(`.price-input[data-item="${CSS.escape(item.id)}"]`)?.closest('.collection-item') : q('.collection-item');
@@ -155,6 +155,8 @@
     for(const child of document.body.children)visit(child);
   }
   function clear() {
+    releaseMenu();menuWait=null;geometryObserver.disconnect();observedGeometry=[];
+    if(geometryFrame)cancelAnimationFrame(geometryFrame);geometryFrame=null;revealTarget=false;
     restoreInert();root?.remove();root=null;target=null;panelKey='';lastTarget=null;
     document.body.classList.remove('pt-active');document.documentElement.style.removeProperty('--pt-panel-height');document.documentElement.style.removeProperty('--pt-safe-top');
   }
@@ -179,6 +181,7 @@
       document.body.append(root);
     }
     const card=root.querySelector('.pt-panel');root.dataset.mode=mode;
+    if(mode!=='step')root.dataset.preparing='false';
     if(panelKey!==key){
       const focused=root.contains(document.activeElement);panelKey=key;
       card.setAttribute('role',mode==='step'?'region':'dialog');card.setAttribute('aria-labelledby','pt-title');
@@ -190,58 +193,168 @@
   }
   function decorate(element,scroll=false) {
     restoreInert();target=element;allowOnly(element);document.body.classList.add('pt-active');
-    layout(scroll);
+    watchGeometry();layout(scroll);
   }
-  function layout(scroll=false) {
-    if(!root)return;
-    const card=root.querySelector('.pt-panel'),vv=window.visualViewport;
-    const left=vv?.offsetLeft||0,top=vv?.offsetTop||0,w=vv?.width||innerWidth,h=vv?.height||innerHeight;
-    const centered=root.dataset.mode!=='step'||root.dataset.centered==='true';
-    card.style.width=`${Math.min(centered?440:360,w-24)}px`;
-    card.style.maxHeight=`${centered?h-24:Math.min(270,Math.max(160,h*.5))}px`;
-    const ch=card.getBoundingClientRect().height,cw=card.getBoundingClientRect().width;
-    document.documentElement.style.setProperty('--pt-panel-height',`${ch+24}px`);
-    let cx=left+(w-cw)/2,cy=top+(h-ch)/2;
-    const header=q('.topbar')?.getBoundingClientRect();
-    const isHeader=target?.closest('.topbar')||target?.classList.contains('modal');
-    const safeTop=Math.max(top+10,!isHeader&&header?header.bottom+10:top+10);
-    document.documentElement.style.setProperty('--pt-safe-top',`${safeTop}px`);
-    if(!centered){
-      cy=top+h-ch-12;
-      if(scroll&&target){
-        const r=target.getBoundingClientRect(),available=Math.max(44,cy-safeTop-16);
-        if(r.top<safeTop||r.bottom>cy-12){
-          // For long forms, show the beginning and let the user scroll through it.
-          target.scrollIntoView({block:'start',behavior:'instant'});
-          if(!isHeader)window.scrollBy(0,target.getBoundingClientRect().top-safeTop);
-          if(r.height<available&&q('#messages')?.contains(target))target.scrollIntoView({block:'center',behavior:'instant'});
-        }
-      }
-      let r=target?.getBoundingClientRect();
-      if((w>1000||w>=600&&h<500)&&r&&r.height<h*.65){
-        if(r.right+cw+28<left+w){cx=r.right+16;cy=Math.max(top+12,Math.min(r.top,top+h-ch-12));}
-        else if(r.left-cw-28>left){cx=r.left-cw-16;cy=Math.max(top+12,Math.min(r.top,top+h-ch-12));}
-      }
+  function releaseMenu() {
+    const owned=menuLease?.openedByTour;menuLease=null;
+    if(owned&&host?.navigation().open)host.setMenu(false);
+  }
+  function menuNeededForRoute(route) {
+    if(!running())return false;
+    const s={...host.snapshot(),route},current=step();
+    const next=current.done?.(s)?steps[steps.indexOf(current)+1]:current;
+    const element=typeof next?.target==='function'?next.target(s):next?.target?q(next.target):null;
+    return !!element?.closest('.sidebar');
+  }
+  function prepareNavigation(element) {
+    const sidebar=element?.closest('.sidebar'),navigation=host.navigation();
+    if(!sidebar)releaseMenu();
+    if(!navigation.collapsed){menuWait=null;return true;}
+    const movingSidebar=sidebar||q('.sidebar');
+    if(!movingSidebar){menuWait=null;return true;}
+    const key=`${tour.step}|${host.snapshot().route}|${host.snapshot().user?.id}`;
+    if(menuWait?.key===key&&menuWait.sidebar===movingSidebar)return false;
+    if(sidebar){
+      if(!navigation.open){menuLease||={openedByTour:true};host.setMenu(true);}
+      else menuLease||={openedByTour:false};
     }
-    card.style.left=`${cx}px`;card.style.top=`${cy}px`;
-    let hole={x:left,y:top,width:0,height:0};
-    if(target&&!centered){
-      const r=target.getBoundingClientRect(),docked=Math.abs(cx-(left+(w-cw)/2))<1;
-      const y1=Math.max(safeTop-6,r.top-5),y2=Math.min(docked?cy-10:top+h-8,r.bottom+5);
-      const x1=Math.max(left+5,r.left-5),x2=Math.min(left+w-5,r.right+5);
-      hole={x:x1,y:y1,width:Math.max(0,x2-x1),height:Math.max(0,y2-y1)};
+    // A closing drawer must also finish before highlighting the content behind it.
+    const animations=movingSidebar.getAnimations().filter(a=>a.playState==='running');
+    if(!animations.length){menuWait=null;return true;}
+    const wait=menuWait={key,sidebar:movingSidebar};
+    // Wait for the actual CSS transition, then two painted frames. No timed guess.
+    Promise.allSettled(animations.map(a=>a.finished)).then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      if(menuWait===wait){menuWait=null;sync();}
+    })));
+    return false;
+  }
+  function watchGeometry() {
+    const nodes=[target,target?.parentElement,root?.querySelector('.pt-panel'),q('#main'),q('.topbar'),q('.sidebar')].filter(Boolean);
+    if(nodes.length===observedGeometry.length&&nodes.every((n,i)=>n===observedGeometry[i]))return;
+    geometryObserver.disconnect();nodes.forEach(n=>geometryObserver.observe(n));observedGeometry=nodes;
+  }
+  function scheduleLayout(reveal=false) {
+    if(!root)return;revealTarget||=reveal;
+    if(geometryFrame)return;
+    geometryFrame=requestAnimationFrame(()=>{geometryFrame=null;const reveal=revealTarget;revealTarget=false;layout(reveal);});
+  }
+  const clamp=(value,min,max)=>Math.max(min,Math.min(value,Math.max(min,max)));
+  const intersect=(a,b)=>({left:Math.max(a.left,b.left),top:Math.max(a.top,b.top),right:Math.min(a.right,b.right),bottom:Math.min(a.bottom,b.bottom)});
+  function visibleRect(element,bounds) {
+    let rect=intersect(element.getBoundingClientRect(),bounds);
+    for(let parent=element.parentElement;parent&&parent!==document.body;parent=parent.parentElement){
+      const style=getComputedStyle(parent),box=parent.getBoundingClientRect();
+      if(/auto|scroll|hidden|clip/.test(style.overflowY))rect=intersect(rect,{...bounds,top:box.top,bottom:box.bottom});
+      if(/auto|scroll|hidden|clip/.test(style.overflowX))rect=intersect(rect,{...bounds,left:box.left,right:box.right});
     }
-    const ring=root.querySelector('.pt-ring');
-    Object.assign(ring.style,{left:`${hole.x}px`,top:`${hole.y}px`,width:`${hole.width}px`,height:`${hole.height}px`,display:hole.height?'block':'none'});
-    const rects=hole.height?[
-      [left,top,w,hole.y-top],[left,hole.y,hole.x-left,hole.height],
-      [hole.x+hole.width,hole.y,left+w-hole.x-hole.width,hole.height],
-      [left,hole.y+hole.height,w,top+h-hole.y-hole.height]
-    ]:[[left,top,w,h],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
-    root.querySelectorAll('.pt-shade').forEach((node,i)=>{const [x,y,width,height]=rects[i];Object.assign(node.style,{left:`${x}px`,top:`${y}px`,width:`${Math.max(0,width)}px`,height:`${Math.max(0,height)}px`});});
+    return rect;
+  }
+  function reveal(element,bounds,preferField=false) {
+    const active=document.activeElement;
+    let anchor=element.contains(active)&&active.matches('input,textarea,select,button,a')?active:element;
+    // In a tall card, reveal the editable control rather than only its heading.
+    // Do not focus it here: scrolling must not open the mobile keyboard.
+    if(preferField&&anchor===element)anchor=element.querySelector('input:not([type=file]):not([type=hidden]):not([type=checkbox]):not([type=radio]):not([readonly]):not(:disabled),textarea:not([readonly]):not(:disabled),select:not(:disabled)')||element;
+    const field=anchor.closest('.field');
+    if(preferField&&field&&element.contains(field)&&field.getBoundingClientRect().height<=bounds.bottom-bounds.top)anchor=field;
+    let r=anchor.getBoundingClientRect();
+    if(r.top>=bounds.top&&r.bottom<=bounds.bottom)return;
+    anchor.scrollIntoView({block:r.height>bounds.bottom-bounds.top?'start':'nearest',inline:'nearest',behavior:'instant'});
+    if(!anchor.closest('.sidebar,.topbar,.modal')){
+      r=anchor.getBoundingClientRect();
+      if(r.top<bounds.top||r.height>bounds.bottom-bounds.top)window.scrollBy({top:r.top-bounds.top,behavior:'instant'});
+      else if(r.bottom>bounds.bottom)window.scrollBy({top:r.bottom-bounds.bottom,behavior:'instant'});
+    }
+  }
+  function readHint(card) {
     const description=card.querySelector('.pt-description');
     card.querySelector('.pt-read-hint').hidden=description.scrollTop+description.clientHeight>=description.scrollHeight-1;
   }
+  function layout(scroll=false) {
+    if(!root)return;
+    if(target&&!target.isConnected){sync();return;}
+    const card=root.querySelector('.pt-panel'),vv=window.visualViewport,gap=16,margin=12;
+    const viewport={left:vv?.offsetLeft||0,top:vv?.offsetTop||0};
+    viewport.right=viewport.left+(vv?.width||innerWidth);viewport.bottom=viewport.top+(vv?.height||innerHeight);
+    const bounds={left:viewport.left+margin,top:viewport.top+margin,right:viewport.right-margin,bottom:viewport.bottom-margin};
+    const centered=root.dataset.mode!=='step'||root.dataset.centered==='true'||!target;
+    const inSidebar=target?.closest('.sidebar'),header=q('.topbar')?.getBoundingClientRect(),sidebar=q('.sidebar');
+    if(!centered&&!inSidebar&&!target.closest('.topbar,.modal')&&header)bounds.top=Math.max(bounds.top,header.bottom+margin);
+    if(!centered&&!inSidebar&&!target.closest('.modal')&&sidebar&&!host.navigation().collapsed)bounds.left=Math.max(bounds.left,sidebar.getBoundingClientRect().right+margin);
+    const width=Math.max(1,bounds.right-bounds.left),height=Math.max(1,bounds.bottom-bounds.top);
+    card.style.width=`${Math.min(centered?440:360,width)}px`;
+    card.style.maxHeight=`${centered?height:Math.min(270,height)}px`;
+    document.documentElement.style.setProperty('--pt-safe-top',`${bounds.top}px`);
+    // Reserve space for the last document fields without tying panel placement to it.
+    document.documentElement.style.setProperty('--pt-panel-height',`${card.getBoundingClientRect().height+24}px`);
+    if(target&&!centered){
+      const visible=visibleRect(target,bounds);
+      if(scroll||visible.bottom<=visible.top)reveal(target,bounds);
+    }
+    let size=card.getBoundingClientRect(),position={left:bounds.left+(width-size.width)/2,top:bounds.top+(height-size.height)/2,side:'center'};
+    let hole=null;
+    if(target&&!centered){
+      const r=target.getBoundingClientRect(),description=card.querySelector('.pt-description');
+      const minimumHeight=()=>Math.min(size.height,size.height-description.getBoundingClientRect().height+Math.max(34,parseFloat(getComputedStyle(description.firstElementChild).lineHeight)*2));
+      let minHeight=minimumHeight();
+      function candidates(rect) {
+        const choices=[];
+        const add=(side,spaceWidth,spaceHeight,left,top)=>{
+          if(spaceWidth+1<size.width||spaceHeight+1<minHeight)return;
+          const h=Math.min(size.height,spaceHeight);
+          choices.push({side,left,top:typeof top==='function'?top(h):top,height:h,score:h+(side==='right'||side==='left'?2:0)});
+        };
+        add('right',bounds.right-rect.right-gap,height,rect.right+gap,h=>clamp(rect.top,bounds.top,bounds.bottom-h));
+        add('left',rect.left-gap-bounds.left,height,rect.left-gap-size.width,h=>clamp(rect.top,bounds.top,bounds.bottom-h));
+        add('below',width,bounds.bottom-rect.bottom-gap,clamp(rect.left,bounds.left,bounds.right-size.width),rect.bottom+gap);
+        add('above',width,rect.top-gap-bounds.top,clamp(rect.left,bounds.left,bounds.right-size.width),h=>rect.top-gap-h);
+        return choices.sort((a,b)=>b.score-a.score);
+      }
+      let choices=candidates(r);
+      // A compact lateral panel can preserve a whole target in a short viewport.
+      if(!choices.length){
+        const lateral=Math.max(bounds.right-r.right-gap,r.left-gap-bounds.left);
+        if(lateral>=Math.min(260,width)&&lateral<size.width){
+          card.style.width=`${lateral}px`;size=card.getBoundingClientRect();minHeight=minimumHeight();choices=candidates(r);
+        }
+      }
+      if(!choices.length&&scroll&&!target.closest('.sidebar,.topbar,.modal')&&r.height+minHeight+gap<=height){
+        window.scrollBy({top:r.top-bounds.top,behavior:'instant'});choices=candidates(target.getBoundingClientRect());
+      }
+      if(choices.length){
+        position=choices[0];card.style.maxHeight=`${position.height}px`;
+      }else{
+        // The whole form/card cannot fit with the panel. Share the viewport with
+        // its visible portion, keeping the focused field on the interaction side.
+        const active=document.activeElement,focus=target.contains(active)?active.getBoundingClientRect():null;
+        const above=focus&&focus.top-bounds.top>bounds.bottom-focus.bottom;
+        const h=Math.min(Math.max(minHeight,height*.48),Math.max(1,height-60));
+        card.style.maxHeight=`${h}px`;size=card.getBoundingClientRect();
+        position={side:above?'split-above':'split-below',left:clamp(r.left,bounds.left,bounds.right-size.width),top:above?bounds.top:bounds.bottom-size.height};
+        const interaction={...bounds,...(above?{top:position.top+size.height+gap}:{bottom:position.top-gap})};
+        if(scroll)reveal(target,interaction,true);
+      }
+      size=card.getBoundingClientRect();
+      position.left=clamp(position.left,bounds.left,bounds.right-size.width);
+      position.top=clamp(position.top,bounds.top,bounds.bottom-size.height);
+      let visible=visibleRect(target,bounds);
+      if(position.side==='split-below')visible.bottom=Math.min(visible.bottom,position.top-gap);
+      if(position.side==='split-above')visible.top=Math.max(visible.top,position.top+size.height+gap);
+      if(visible.bottom>visible.top&&visible.right>visible.left)hole={left:Math.max(bounds.left-5,visible.left-5),top:Math.max(bounds.top-5,visible.top-5),right:Math.min(bounds.right+5,visible.right+5),bottom:Math.min(bounds.bottom+5,visible.bottom+5)};
+    }
+    card.style.left=`${position.left}px`;card.style.top=`${position.top}px`;root.dataset.placement=position.side;
+    const ring=root.querySelector('.pt-ring');
+    Object.assign(ring.style,hole?{left:`${hole.left}px`,top:`${hole.top}px`,width:`${hole.right-hole.left}px`,height:`${hole.bottom-hole.top}px`,display:'block'}:{display:'none'});
+    const rects=hole?[
+      [viewport.left,viewport.top,viewport.right-viewport.left,hole.top-viewport.top],
+      [viewport.left,hole.top,hole.left-viewport.left,hole.bottom-hole.top],
+      [hole.right,hole.top,viewport.right-hole.right,hole.bottom-hole.top],
+      [viewport.left,hole.bottom,viewport.right-viewport.left,viewport.bottom-hole.bottom]
+    ]:[[viewport.left,viewport.top,viewport.right-viewport.left,viewport.bottom-viewport.top],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+    root.querySelectorAll('.pt-shade').forEach((node,i)=>{const [x,y,w,h]=rects[i];Object.assign(node.style,{left:`${x}px`,top:`${y}px`,width:`${Math.max(0,w)}px`,height:`${Math.max(0,h)}px`});});
+    readHint(card);
+  }
+
   function resumeEntry(s) {
     if(tour.status!=='interrupted'||s.route!=='guia'||q('[data-pt-action="resume"]'))return;
     const box=document.createElement('section');box.className='panel pt-resume';
@@ -326,6 +439,8 @@
     panel(title,text,buttons,'step',key,numbered?`Passo ${steps.indexOf(current)+1} de ${steps.length} · ${current.role==='client'?'Cliente':'Colaborador'}`:'COTAJUNTO · '+(mode==='business-modal'?'CONFIRMAÇÃO':'RETOMAR GUIA'));
     root.dataset.step=tour.step;root.dataset.context=mode;
     root.dataset.centered=String(!!current.centered&&mode==='normal');
+    const ready=prepareNavigation(element);root.dataset.preparing=String(!ready);
+    if(!ready){decorate(null);return;}
     decorate(element,changed);lastTarget=element;lastStep=tour.step;
     if(changed&&element&&!element.contains(document.activeElement)){
       const focusable=current.info?root.querySelector('button'):element.matches('button,a,input,textarea,select')?element:element.querySelector('input:not([type=file]),button,a,select,textarea');
@@ -382,11 +497,14 @@
     }
   },true);
   window.addEventListener('storage',event=>{if(event.key===KEY){const owned=running();tour=read(event.newValue);if(owned&&tour.owner!==tabId)takeoverDismissed=true;exitPrompt=false;missingReason='';clear();sync();}});
-  window.addEventListener('resize',()=>layout());window.addEventListener('scroll',()=>layout(),true);
-  window.visualViewport?.addEventListener('resize',()=>layout());window.visualViewport?.addEventListener('scroll',()=>layout());
+  window.addEventListener('resize',()=>{sync();scheduleLayout(true);});
+  window.addEventListener('scroll',event=>{if(root?.contains(event.target)){readHint(root.querySelector('.pt-panel'));return;}scheduleLayout();},true);
+  document.addEventListener('focusin',event=>{if(target?.contains(event.target))scheduleLayout(true);});
+  document.addEventListener('load',()=>scheduleLayout(),true);
+  window.visualViewport?.addEventListener('resize',()=>{sync();scheduleLayout(true);});window.visualViewport?.addEventListener('scroll',()=>scheduleLayout());
   window.CotaJuntoTour=Object.freeze({
     connect(api){host=api;new MutationObserver(sync).observe(q('#app'),{childList:true,subtree:true});new MutationObserver(sync).observe(q('#modal-root'),{childList:true,subtree:true});sync();},
-    sync,reset,afterLogin,arrivalPage,isRunning:running,
+    sync,reset,afterLogin,arrivalPage,menuNeededForRoute,isRunning:running,
     accessUserId:role=>running()?tour[role+'Id']:null,
     switchUserId:()=>running()?tour[host.snapshot().role==='client'?'workerId':'clientId']:null,
     requestTag:()=>running()&&tour.step==='confirm-request'&&!tour.demoRequestId?{tourRunId:tour.runId}:{}

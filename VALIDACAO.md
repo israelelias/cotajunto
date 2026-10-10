@@ -1,3 +1,63 @@
+# Validação responsiva e de navegação — etapa 2.3
+
+Testes em **10 de outubro de 2026**, com Google Chrome automatizado. Os arquivos estáticos reais foram fornecidos ao navegador por interceptação HTTP de teste, mantendo rotas hash, subdiretório, JavaScript, armazenamento e renderização do aplicativo. Esse recurso pertence apenas aos testes e não é incluído na publicação.
+
+## Matriz e percurso completo
+
+| Viewport | Percurso conectado de 62 passos |
+| --- | --- |
+| 320 × 568 | Aprovado |
+| 360 × 640 | Aprovado |
+| 375 × 667 | Aprovado |
+| 390 × 844 | Aprovado |
+| 412 × 915 | Aprovado |
+| 768 × 1024 | Aprovado; modo escuro e dois produtos |
+| 1024 × 768 | Aprovado |
+| 1366 × 768 | Aprovado |
+| 1920 × 1080 | Aprovado |
+| 667 × 375 | Aprovado; celular em paisagem |
+
+O percurso executa a criação da solicitação, troca de perfil, aceite, preços e evidência de produto, chat, envio, pedido de ajuste com mensagem obrigatória, correção, reenvio, aprovação, recompensa fictícia, avaliação, recebimento e encerramento. Usa o mesmo pedido, verifica revisão 2, preço corrigido e nota 5. Nenhum passo usa clique manual no hambúrguer para revelar o link exigido pelo guia.
+
+Conferidos em cada etapa: numeração, limites do painel, leitura completa dos textos, ações acessíveis, ausência de overflow horizontal e ausência de sobreposição entre painel e área destacada. Foram inspecionadas capturas de entrada, Nova lista, menus, perfil, preços, chat, aprovação, avaliação e encerramento em celular, paisagem, tablet e desktop. O refinamento dos cards altos foi retestado com clique real no campo de preço.
+
+As ações continuam obrigatórias: mensagem vazia não solicita ajuste; preço inalterado não conclui correção; abrir ou cancelar confirmação não aprova orçamento; estrelas sem envio não concluem avaliação. F5 preserva reenvio e rascunho de avaliação. No tablet, as cinco entradas de troca também foram recarregadas. A conclusão remove bloqueios e não reabre o guia após F5.
+
+## Navegação e geometria
+
+**11 grupos de verificações aprovados:**
+
+1. Abertura automática em Início, Minhas listas, Meu perfil e Guia no Cliente, com restauração ao sair.
+2. Preservação do menu aberto previamente pelo Cliente.
+3. Abertura automática em Início, Minhas coletas, Meu perfil e Guia no Colaborador, com restauração ao sair.
+4. Preservação do menu aberto previamente pelo Colaborador.
+5. Resize, orientação, fechamento durante um passo e F5: alvo clicável e ring/sombras alinhados.
+6. Passos consecutivos de navegação mantêm o menu aberto; passagem ao conteúdo dispensa a abertura feita pelo guia.
+7. Cabeçalho, notificações e cards; rolagem interna do texto não desloca o ring.
+8. Scroll da página e alteração de altura do conteúdo recalculam a geometria.
+9. Observadores estabilizam quando a interface está em repouso, sem ciclo contínuo de recálculo.
+10. Escape durante a abertura do menu exibe a confirmação, permite continuar e aguarda a estabilização.
+11. Zoom visual de 125% mantém painel, ações e leitura interna disponíveis; o fechamento do menu termina antes de destacar o conteúdo seguinte.
+
+Os testes de componentes genéricos acrescentam alvos e transições exclusivamente na memória do navegador de teste, para conferir opções que não fazem parte da sequência atual. **O produto entregue continua com 62 passos.** Também foi verificada a cobertura da viewport pelas quatro sombras e pelo recorte do alvo, sem lacunas de geometria.
+
+## Preservação e regressões
+
+- **9 grupos de estado/compatibilidade:** sequência, textos e condições idênticos à etapa 2.2; quatro resets (Perfil/Guia × Cliente/Colaborador), chegada de login interrompida, desvio manual legítimo, progresso antigo e conclusão antiga.
+- **9 grupos de ciclo de vida:** recusa, reset durante o guia, F5/rascunhos/rotas, saída, retomada, fechar/reabrir, controle entre abas, Escape e cenário ausente.
+- **3 grupos de adaptação:** teclado/rotação/movimento reduzido, liberação de rolagem e controles após saída, armazenamento bloqueado com aviso e uso na aba.
+- **12 grupos de uso livre:** criação, coleta, foto, chat, ajuste, reenvio, aprovação, recompensa, avaliação, recusa, cadastro, recuperação simulada, sincronização entre abas e telas responsivas.
+
+Não ocorreram erros JavaScript nos testes monitorados. Confirmados README, appearance.css e index.html inalterados; verificadas a sintaxe dos arquivos JavaScript e a integridade/igualdade dos 11 arquivos do ZIP. Evidências e testes ficam em `work/tour-mobile-qa`, `work/tour-mobile-regression-qa` e scripts `work/*23.cjs`/`work/test_tour_mobile*.cjs`, fora do pacote de publicação.
+
+## Limites
+
+Os testes utilizam viewports simuladas no Chrome, não aparelhos físicos ou Safari. O zoom foi exercitado pela viewport visual; o teclado virtual nativo do celular ainda merece conferência em aparelho real. Em paisagem ou áreas muito pequenas, parte de um card alto pode permanecer fora do destaque enquanto o campo necessário fica visível; o conteúdo explicativo continua rolável. Isso é o fallback previsto na especificação.
+
+O PDF indicado não estava disponível; foram usadas as observações correspondentes, suas cinco capturas e a especificação integral localizadas na pasta da disciplina, conforme detalhado em ALTERACOES.md. Não foi realizada publicação remota. Persistem as limitações originais de simulação e armazenamento local, sem transações reais ou colaboração entre dispositivos independentes.
+
+---
+
 # Validação de fluxo e transições — etapa 2.2
 
 Testes em **9 de outubro de 2026**, com Google Chrome automatizado e os arquivos finais do projeto. O ambiente não permitiu alcançar o servidor HTTP local, e o Edge não iniciou; por isso os testes serviram os arquivos estáticos sem alteração por uma interceptação HTTP do Playwright. O navegador executou o JavaScript real, as ações de interface, rotas hash, armazenamento e renderização. A aplicação publicada não inclui esse mecanismo de teste.
