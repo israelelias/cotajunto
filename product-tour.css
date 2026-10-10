@@ -1,0 +1,30 @@
+/* Product Tour is an isolated presentation layer; existing responsive styles stay intact. */
+#product-tour-root { position: fixed; inset: 0; z-index: 120; pointer-events: none; }
+.pt-shade { position: fixed; background: #071b15a8; pointer-events: auto; touch-action: pan-y; }
+.pt-ring { position: fixed; border: 2px solid var(--lime); border-radius: 12px; box-shadow: 0 0 0 4px #d9ef9533; pointer-events: none; }
+.pt-panel { position: fixed; display: flex; flex-direction: column; padding: 18px; gap: 10px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 12px 48px #0004; pointer-events: auto; overflow-wrap: anywhere; }
+.pt-kicker { color: var(--green); font-weight: 700; font-size: 11px; letter-spacing: .4px; }
+.pt-panel h2 { font-size: 19px; line-height: 1.25; letter-spacing: -.3px; }
+.pt-description { overflow-y: auto; overscroll-behavior: contain; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--muted) transparent; }
+.pt-description p { font-size: 13px; line-height: 1.55; color: var(--muted); }
+.pt-description p + p { margin-top: 8px; }
+.pt-description .pt-instruction { color: var(--ink); font-weight: 600; }
+.pt-description .pt-storage { color: var(--orange); margin-top: 8px; }
+.pt-actions { display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; }
+.pt-actions .btn { min-height: 44px; font-size: 12px; padding: 9px 12px; flex: 1 1 auto; }
+.pt-active { padding-bottom: var(--pt-panel-height,280px); }
+html:has(body.pt-active) { scroll-padding-top: var(--pt-safe-top,10px); scroll-padding-bottom: var(--pt-panel-height,280px); }
+.pt-active #modal-root .modal-backdrop { padding-bottom: var(--pt-panel-height,280px); }
+.pt-active #modal-root .modal { max-height: calc(100dvh - var(--pt-panel-height,280px) - 32px); }
+.pt-resume { margin-bottom: 18px; }
+.pt-resume p { margin: 8px 0 14px; }
+@media (max-width: 740px) {
+  .pt-panel { padding: 13px; gap: 7px; }
+  .pt-panel h2 { font-size: 17px; }
+  .pt-description p { font-size: 12px; }
+  .pt-kicker { font-size: 10px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pt-ring { animation: pt-glow 2.4s ease-in-out infinite; }
+  @keyframes pt-glow { 50% { box-shadow: 0 0 0 6px #d9ef9559; } }
+}

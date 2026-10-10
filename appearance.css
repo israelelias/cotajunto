@@ -1,7 +1,7 @@
 /* Appearance, profile identity and guided access. Business styles remain in styles.css. */
 :root {
   color-scheme: light;
-  --header-height: 86px;
+  --header-height: 76px;
   --surface: #fff;
   --surface-soft: #eef4e8;
   --profile-bg: #edf4e6;
@@ -149,16 +149,17 @@ html[data-theme="dark"][data-profile="worker"] { --profile-bg: #102f29; --profil
 
 @media (max-width: 1250px) { .topbar .pill.demo { display: none; } }
 @media (max-width: 1150px) {
-  :root { --header-height: 112px; }
-  .topbar { display: grid; grid-template-columns: 1fr; gap: 6px; padding-block: 10px; }
+  :root { --header-height: 72px; }
+  .topbar { padding-inline: 20px; }
   .top-actions { justify-content: flex-end; }
   .top-actions>.avatar { display: none; }
 }
 @media (max-width: 950px) { .summary { position: static; } }
 @media (max-width: 740px) {
+  :root { --header-height: 104px; }
   .sidebar { z-index: 60; }
   .nav-scrim { z-index: 55; }
-  .topbar { min-height: var(--header-height); }
+  .topbar { display: grid; grid-template-columns: 1fr; gap: 4px; padding: 6px 16px; min-height: var(--header-height); }
   .top-left { gap: 8px; }
   .profile-indicator { margin-left: auto; font-size: 11px; gap: 4px; }
   .profile-indicator .icon { display: none; }
@@ -177,13 +178,13 @@ html[data-theme="dark"][data-profile="worker"] { --profile-bg: #102f29; --profil
 @media (prefers-reduced-motion: reduce) { .demo-choice.tour-target { animation: none; } }
 
 /* Worker overview reuses the existing panels, cards and palette. */
-.worker-finances { margin-bottom: 22px; }
-.finance-card { display: flex; flex-direction: column; min-width: 0; }
+.worker-finances { margin-bottom: 18px; }
+.finance-card { display: flex; flex-direction: column; min-width: 0; padding: 20px; }
 .finance-card h2 { font-size: 15px; letter-spacing: -.2px; }
 .finance-card>.row { align-items: flex-start; gap: 9px; }
 .finance-card>.row>.icon { color: var(--green); }
-.finance-value { display: block; font-size: clamp(25px,2.6vw,35px); line-height: 1.2; letter-spacing: -1px; margin: 22px 0 12px; color: var(--forest); overflow-wrap: anywhere; }
-.finance-card p { font-size: 12px; color: var(--muted); margin-bottom: 15px; }
+.finance-value { display: block; font-size: clamp(25px,2.6vw,32px); line-height: 1.2; letter-spacing: -1px; margin: 12px 0 8px; color: var(--forest); overflow-wrap: anywhere; }
+.finance-card p { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
 .finance-card>.link-btn,.finance-card>.pill { margin-top: auto; align-self: flex-start; }
 .finance-card>.pill { white-space: normal; }
 .balance-card { background: var(--surface-soft); }
@@ -207,17 +208,244 @@ html[data-theme="dark"][data-profile="worker"] { --profile-bg: #102f29; --profil
 .review-list li p { font-size: 13px; margin-top: 8px; color: var(--muted); overflow-wrap: anywhere; }
 .profile-history-actions { margin-top: 18px; }
 [data-theme="dark"] .balance-card { background: var(--surface-soft); }
-@media (min-width: 741px) and (max-width: 1150px) {
-  .worker-finances { grid-template-columns: repeat(2,minmax(0,1fr)); }
-  .worker-finances .finance-card:last-child { grid-column: 1/-1; }
+@media (min-width: 541px) and (max-width: 1150px) {
+  .worker-finances .finance-card:last-child { grid-column: 1/-1; display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: center; }
+  .worker-finances .finance-card:last-child .finance-value { grid-column: 2; grid-row: 1/3; margin: 0; }
+  .worker-finances .finance-card:last-child p { margin: 0; }
+  .worker-finances .finance-card:last-child .link-btn { grid-column: 1/-1; }
 }
 @media (max-width: 740px) {
-  .worker-finances { grid-template-columns: 1fr; gap: 14px; }
-  .finance-value { font-size: 32px; margin: 15px 0 10px; }
-  .finance-card { padding: 20px; }
   .collection-summary .metric { min-width: 0; }
   .collection-shortcut>.icon { display: none; }
 }
-@media (max-width: 380px) {
-  .dashboard-section .section-title { align-items: flex-start; flex-wrap: wrap; gap: 4px; }
+
+/* Responsive refinement: retain the existing components and visual identity.
+   Let content wrap rather than hiding overflow or shrinking touch controls. */
+.main, .auth-form, .modal, .notify-menu { overflow-wrap: anywhere; }
+:is(.grid-main,.two-col,.three-col,.chat-layout,.form-grid,.input-row,.collection-fields)>* { min-width: 0; }
+.two-col { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.three-col { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.field, .field input, .field select, .field textarea, .input { min-width: 0; }
+.icon-btn { flex-shrink: 0; }
+.page-heading>div { min-width: 0; }
+.page-heading>.btn { flex-shrink: 0; }
+.request-card { padding: 18px; }
+.request-card h3 { margin-top: 10px; }
+.request-card .meta { align-items: flex-start; }
+.request-card .meta .icon { margin-top: 2px; }
+.request-card:only-child { grid-column: 1/-1; }
+.collection-card-meta { margin-top: 10px; gap: 4px; }
+.card-footer { margin-top: 12px; padding-top: 12px; }
+.dashboard-section .section-title { margin-top: 22px; margin-bottom: 12px; }
+.summary dl div>* { min-width: 0; }
+.summary dd { overflow-wrap: anywhere; }
+.summary .btn+.btn { margin-top: 8px; }
+.store-icon, .store-option input { flex-shrink: 0; }
+.collection-top .grow { overflow-wrap: anywhere; }
+.modal-backdrop { padding: 16px; }
+.modal { max-height: calc(100dvh - 32px); overscroll-behavior: contain; }
+.modal img { display: block; margin: auto; max-height: 55dvh; object-fit: contain; }
+.notify-menu { max-height: calc(100dvh - var(--header-height) - 16px); overflow-y: auto; overscroll-behavior: contain; }
+.notification-list { max-height: none; }
+.guide code { overflow-wrap: anywhere; }
+
+@media (min-width: 951px) {
+  .dashboard-previews { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 22px; }
+  .dashboard-previews .two-col { grid-template-columns: 1fr; }
+}
+@media (min-width: 541px) and (max-width: 1150px) {
+  .worker-finances { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 1350px) {
+  .input-row { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .input-row .field:first-child { grid-column: 1/-1; }
+  .input-row>.btn { grid-column: 1/-1; justify-self: end; }
+}
+@media (max-width: 1150px) {
+  .main { padding: 26px 24px 32px; }
+  .top-actions { gap: 8px; }
+  .profile-indicator { font-size: 12px; }
+  .topbar .switch { padding-inline: 10px; }
+}
+@media (max-width: 950px) {
+  /* A summary is one panel; only the separate guide panels need columns. */
+  .grid-main>aside.summary { display: block; }
+  .grid-main>aside.stack { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .page-heading { flex-wrap: wrap; gap: 12px; }
+  .page-heading>.btn { width: auto; }
+  .summary dl { margin-block: 16px; gap: 10px; }
+  .summary .notice { margin-top: 14px; }
+  .panel { padding: 20px; }
+  .chat-panel { padding: 0; }
+  .tabs { flex-wrap: wrap; }
+  .tabs button { min-height: 44px; }
+  .filter-bar .search { max-width: none; }
+}
+@media (max-width: 740px) {
+  .main { padding: 20px 16px 28px; }
+  h1, .page-heading h1 { font-size: 27px; }
+  .page-heading { margin-bottom: 18px; }
+  .page-heading p { margin-top: 6px; }
+  .page-heading>.btn { min-height: 44px; }
+  .breadcrumb { margin-bottom: 14px; min-height: 28px; flex-wrap: wrap; }
+  .breadcrumb a { display: inline-flex; align-items: center; min-height: 44px; }
+  .topbar .icon-btn, .icon-btn { width: 44px; height: 44px; }
+  .topbar .switch { min-height: 44px; }
+  .top-actions { gap: 8px; }
+  .btn, .btn.small { min-height: 44px; }
+  .link-btn { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; }
+  .sidebar { padding: 20px 16px 16px; max-width: calc(100vw - 56px); }
+  .sidebar .brand { margin-bottom: 26px; }
+  .sidebar-bottom { padding-top: 20px; }
+  .sidebar-user { padding-top: 12px; }
+  .sidebar-user .icon-btn { width: 44px; }
+  .demo-card { padding: 12px; margin-bottom: 12px; }
+  .nav { gap: 4px; }
+  .nav a { padding-block: 10px; }
+  .hero { padding: 20px; min-height: 0; margin-bottom: 18px; }
+  .hero h2 { font-size: 24px; }
+  .hero p { margin: 9px 0 15px; max-width: 440px; }
+  .hero-illustration { display: none; }
+  .metrics { margin-bottom: 20px; }
+  .metric { padding: 12px; gap: 8px; align-items: flex-start; }
+  .metric span { font-size: 12px; line-height: 1.35; display: block; margin-top: 3px; }
+  .metric strong { font-size: 24px; }
+  .three-col { gap: 8px; }
+  .two-col, .grid-main, .chat-layout, .stack { gap: 14px; }
+  .section-title { margin: 18px 0 12px; gap: 10px; flex-wrap: wrap; }
+  .section-title h2 { font-size: 18px; }
+  .dashboard-section .section-title { gap: 8px; margin: 18px 0 10px; }
+  .panel { padding: 16px; }
+  .panel-header { margin-bottom: 14px; flex-wrap: wrap; }
+  .divider { margin-block: 16px; }
+  .request-card { padding: 14px; }
+  .request-card h3 { font-size: 16px; margin-top: 9px; }
+  .request-card .product-icons { display: none; }
+  .request-card .card-footer { min-height: 40px; margin-top: 10px; padding-top: 10px; }
+  .request-card>.row>.text-sm { font-size: 12px; }
+  .collection-card-meta { display: flex; justify-content: space-between; gap: 5px 14px; flex-wrap: wrap; }
+  .collection-card-meta strong { white-space: nowrap; }
+  .collection-card-meta>span { min-width: 0; }
+  .notice { padding: 11px 12px; }
+  .tip-card { padding: 16px; }
+  .tip-card h3 { margin: 8px 0; }
+  .mini-steps { margin-top: 16px; gap: 14px; }
+  .field { margin-bottom: 14px; gap: 6px; }
+  .field input, .field select, .field textarea, input.input, select.input, textarea.input { font-size: 16px; padding: 10px 11px; }
+  .search input.input { padding-left: 38px; }
+  .search .icon { top: 15px; }
+  .password-row input { padding-right: 48px; }
+  .password-row button { width: 44px; height: 44px; top: 1px; right: 1px; }
+  .input-row { gap: 10px; }
+  .draft-items { margin-top: 16px; }
+  .draft-items .product-line { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 8px; }
+  .draft-items .product-thumb { display: none; }
+  .product-line { padding-block: 12px; gap: 8px; }
+  .product-line .product-title { font-size: 14px; }
+  .product-thumb { width: 36px; height: 36px; font-size: 21px; }
+  .progress-steps { margin-bottom: 20px; gap: 6px; }
+  .progress-step { white-space: normal; }
+  .progress-step span { flex-shrink: 0; }
+  .store-option { padding: 14px; gap: 10px; margin-block: 10px; }
+  .store-option:has(input:checked) { padding: 13px; }
+  .store-icon { width: 38px; height: 38px; }
+  .reward-editor { padding: 14px; }
+  .reward-editor input { font-size: 19px; }
+  .overview { padding: 14px; gap: 12px; margin-bottom: 16px; }
+  .overview>.icon { width: 24px; height: 24px; }
+  .price-header { gap: 12px; flex-wrap: wrap; }
+  .collection-item { padding: 14px; margin-bottom: 12px; }
+  .collection-top { margin-bottom: 12px; gap: 10px; }
+  .collection-fields { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+  .collection-tools { gap: 4px 12px; margin-top: 10px; }
+  .collection-tools label { min-height: 44px; }
+  .collection-tools input { flex-shrink: 0; }
+  .file-label { padding: 8px; gap: 6px; }
+  .photo-button { min-height: 44px; }
+  .empty { padding: 28px 14px; }
+  .empty>.icon { width: 30px; height: 30px; margin-bottom: 10px; }
+  .preview-empty .empty { padding: 14px 4px; }
+  .profile-head { margin-bottom: 20px; gap: 14px; }
+  .profile-head .avatar { width: 52px; height: 52px; font-size: 20px; }
+  .profile-head h2 { font-size: 20px; overflow-wrap: anywhere; }
+  .review-list { margin-top: 14px; }
+  .review-list li { padding: 14px 0; }
+  .center-panel { padding: 20px 16px; }
+  .reward-icon { width: 56px; height: 56px; margin-bottom: 16px; }
+  .reward-icon .icon { width: 26px; height: 26px; }
+  .center-panel .summary-total { margin-block: 16px; }
+  .stars { margin-block: 18px; }
+  .star { width: 44px; height: 44px; flex-shrink: 0; }
+  .chat-panel { padding: 0; min-height: 0; }
+  .chat-header { padding: 14px; }
+  .chat-header .grow { overflow-wrap: anywhere; }
+  .messages { padding: 14px; gap: 12px; min-height: 180px; max-height: 48dvh; }
+  .message { max-width: 90%; padding: 10px 12px; }
+  .chat-compose { padding: 12px; gap: 8px; }
+  .adjust-compose>.btn { flex: 1 1 auto; }
+  .chat-compose textarea { max-height: 30dvh; }
+  .modal { padding: 20px; border-radius: 16px; }
+  .modal .actions { gap: 8px; }
+  .modal p { margin-bottom: 16px; }
+  .footer-note { margin-top: 24px; }
+  .auth-story { padding: 20px; }
+  .auth-story .eyebrow { margin: 20px 0 10px; }
+  .auth-story h1 { font-size: 28px; line-height: 1.15; letter-spacing: -.8px; max-width: 100%; }
+  .auth-story>p { margin-top: 10px; }
+  .auth-form-area { padding: 20px 20px 30px; }
+  .auth-tools { margin-bottom: 8px; }
+  .auth-form h2 { font-size: 25px; margin-top: 12px; }
+  .auth-form .sub { margin-bottom: 18px; }
+  .demo-choices { margin: 16px 0; }
+  .demo-choice { padding: 12px; }
+  .demo-choice .icon { margin-bottom: 0; width: 18px; height: 18px; }
+  .or { margin-block: 18px; }
+  .auth-bottom { margin-top: 18px; }
+  .auth-form a.text-sm { display: inline-flex; align-items: center; min-height: 44px; }
+}
+@media (max-width: 540px) {
+  .worker-finances { grid-template-columns: 1fr; gap: 10px; }
+  .finance-card { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: start; gap: 6px 12px; padding: 14px; }
+  .finance-card>.row { gap: 7px; align-items: center; }
+  .finance-card h2 { font-size: 14px; }
+  .finance-card>.row>.icon { width: 17px; height: 17px; }
+  .finance-value { grid-column: 2; grid-row: 1/3; align-self: center; font-size: 26px; margin: 0; max-width: 130px; }
+  .finance-card p { margin: 0; }
+  .finance-card>.pill, .finance-card>.link-btn { grid-column: 1/-1; margin-top: 0; }
+  .finance-card>.pill { justify-self: start; }
+  .finance-card>.link-btn { padding-block: 4px; }
+  .two-col { grid-template-columns: 1fr; }
+  .grid-main>aside.stack { grid-template-columns: 1fr; }
+  .filter-bar { gap: 10px; margin-bottom: 16px; }
+  .tabs { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); width: 100%; gap: 4px; }
+  .tabs button { font-size: 12px; padding: 8px; }
+  .search { flex-basis: 100%; }
+  .page-heading>.btn { width: auto; }
+  .form-grid { grid-template-columns: 1fr; }
+  .input-row { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .input-row>.btn { grid-column: auto; width: 100%; }
+  .section-title>.link-btn { white-space: normal; }
+  .dashboard-section .section-title .link-btn { white-space: normal; }
+}
+@media (max-width: 359px) {
+  .main { padding-inline: 12px; }
+  .topbar { padding-inline: 12px; }
+  .top-left { gap: 6px; }
+  .mobile-brand { gap: 4px; font-size: 17px; }
+  .mobile-brand img { width: 24px; height: 24px; }
+  .profile-indicator { font-size: 10px; }
+  .metric { padding-inline: 8px; }
+  .metric span { font-size: 11px; }
+  .finance-card { gap: 6px 8px; }
+  .finance-value { font-size: 24px; max-width: 112px; }
+  .auth-form-area, .auth-story { padding-inline: 16px; }
+  .demo-choice { padding: 10px; }
+  .collection-fields { grid-template-columns: 1fr; }
+}
+@media (max-height: 600px) {
+  .sidebar { padding-top: 16px; }
+  .sidebar .brand { margin-bottom: 18px; }
+  .sidebar-bottom { padding-top: 16px; }
+  .sidebar .demo-card { display: none; }
+  .messages { min-height: 140px; max-height: 40dvh; }
 }
