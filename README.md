@@ -1,176 +1,84 @@
-# CotaJunto — protótipo de orçamento colaborativo
+# CotaJunto
 
-Aplicativo navegável da **Atividade Avaliativa 01 do Projeto Integrador III**, baseado no projeto **Aplicativo de Orçamento Colaborativo em Tempo Real** e na base de requisitos preparada para a atividade.
+**Uma lista de produtos, uma coleta de preços e mais clareza para decidir.**
 
-**Pronto para GitHub Pages.** Não exige instalação de pacotes, compilação, servidor de aplicação, chave de API ou banco de dados. Os arquivos HTML, CSS, JavaScript e SVG são locais, sem bibliotecas ou fontes externas.
+## Sobre o projeto
 
-## Começar a testar
+O CotaJunto é um protótipo acadêmico navegável do Projeto Integrador III. Conecta quem precisa de um orçamento — o **Cliente** — a quem pode conferir preços em um estabelecimento físico — o **Colaborador**. Você experimenta os dois papéis com dados fictícios.
 
-1. Extraia o ZIP.
-2. Abra `index.html` em um navegador moderno para uma demonstração local simples. Para testar a sincronização entre abas de forma consistente, use a versão publicada ou um servidor HTTP local.
-3. Clique em **Sou Cliente** ou **Sou Colaborador**. O botão **Trocar para...** no topo encerra o perfil atual e retorna à entrada. Clique na opção destacada (**Sou Cliente** ou **Sou Colaborador**) para concluir a troca. O Colaborador sempre entra em **Início**. No retorno ao Cliente, o contexto da solicitação é retomado quando disponível.
-4. Consulte **Guia da demonstração**, no menu do aplicativo, para o roteiro do professor.
+**[Acessar o protótipo CotaJunto](https://israelelias.github.io/cotajunto/#/entrar)** — funciona diretamente no navegador.
 
-| Perfil | E-mail fictício | Senha fictícia |
-| --- | --- | --- |
-| Cliente — Marina Alves | cliente@teste.com | demo1234 |
-| Colaborador — João Silva | colaborador@teste.com | demo1234 |
+## Problema que buscamos resolver
 
-O cadastro também funciona como demonstração: cria uma identidade local que usa a mesma senha fictícia. **Não use sua senha, e-mail ou dados pessoais reais.** Não existe autenticação de produção. O botão Google e a recuperação de senha são simulações explicitamente identificadas.
+Nem sempre uma pessoa consegue ou deseja ir até uma loja apenas para pesquisar preços. No CotaJunto, ela informa os produtos e o estabelecimento, enquanto um Colaborador realiza a coleta. O Cliente recebe o orçamento para analisar antes de decidir sobre uma compra.
 
-## Publicar no GitHub Pages
+## Como funciona
 
-1. Entre na sua conta do GitHub e crie um repositório. No plano gratuito, use um repositório público para este procedimento.
-2. Extraia os arquivos do ZIP em seu computador.
-3. Envie **o conteúdo** da pasta do protótipo para a raiz do repositório. O arquivo `index.html` deve ficar diretamente na raiz, junto de `app.js`, `styles.css` e da pasta `assets`.
-4. Inclua o arquivo `.nojekyll`. Ele pode aparecer como arquivo oculto em alguns programas. Nenhum arquivo do protótipo depende de Jekyll.
-5. Confirme o envio dos arquivos com um commit na branch `main` (ou na branch principal que você utiliza).
-6. Abra **Settings → Pages** no repositório.
-7. Em **Build and deployment → Source**, escolha **Deploy from a branch**.
-8. Selecione a branch em que os arquivos foram enviados e a pasta **/(root)**. Clique em **Save**.
-9. Aguarde a publicação terminar. Consulte o link exibido pelo próprio GitHub Pages.
-10. Abra o endereço publicado em uma janela privativa e teste os dois perfis antes de enviar ao professor.
+O Cliente cria uma lista, escolhe um estabelecimento e oferece uma recompensa fictícia. O Colaborador aceita a solicitação, registra os preços e envia o orçamento. O Cliente pode conversar, pedir uma correção ou aprovar o resultado; depois, confirma a recompensa simulada e avalia a coleta.
 
-O endereço de um site de projeto normalmente segue o formato `https://SEU-USUARIO.github.io/SEU-REPOSITORIO/`. Esse endereço é apenas um **modelo**; substitua-o pelo link realmente publicado. O protótipo usa arquivos relativos e rotas com `#`, permitindo recarregar uma tela dentro do subdiretório do repositório.
+**Lista → solicitação → coleta → orçamento → revisão e possíveis ajustes → aprovação → recompensa fictícia → avaliação.**
 
-Não envie somente o ZIP ao repositório: **extraia e publique seus arquivos**. Se o ZIP for enviado sem extração, o GitHub Pages não encontrará a página inicial.
+## Perfis e principais funcionalidades
 
-Referências técnicas: [O que é GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages) e [Configurar a origem de publicação](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+### Cliente
 
-## Roteiro completo para demonstrar
+- **Visão geral e Minhas listas:** acompanhar solicitações, consultar orçamentos e buscar listas por nome ou local, com filtros por andamento.
+- **Nova lista:** adicionar, editar e remover produtos do rascunho, com quantidade, unidade e limite de preço opcional; escolher o estabelecimento e definir a recompensa fictícia, a partir de R$ 5,00, antes da confirmação.
+- **Orçamento e chat:** conferir preços e fotos, conversar com o Colaborador e usar **Pedir ajuste**. O ajuste só é registrado após o envio obrigatório do motivo.
+- **Aprovação e avaliação:** aprovar o orçamento, confirmar a recompensa fictícia e avaliar o Colaborador com uma nota de 1 a 5 e comentário opcional.
+- **Meu perfil:** consultar os dados fictícios da conta, trocar de perfil e reiniciar os dados de teste.
 
-### Criar uma solicitação
+### Colaborador
 
-1. Entre como Cliente e escolha **Nova lista**.
-2. Dê um nome à lista. Adicione os produtos, quantidades, unidades e limites de preço opcionais.
-3. Escolha um estabelecimento.
-4. Revise a lista e defina a recompensa fictícia. Ela começa em **R$ 5,00** e pode ser aumentada antes da confirmação. Confirme; a solicitação ficará **Aguardando colaborador**.
+- **Início:** consultar **Saldo disponível**, **Ganhos em andamento**, **Sua avaliação** (média das notas) e o resumo das coletas. Os atalhos abrem o filtro correspondente em **Minhas coletas**.
+- **Minhas coletas:** gerenciar as coletas, buscar por lista ou local e usar os filtros **Todas**, **Disponíveis**, **Em andamento** e **Concluídas**. O Início fica reservado à visão geral.
+- **Coleta de preços:** aceitar ou recusar uma solicitação; após o aceite, preencher preços por unidade, marcar **Item conferido** ou **Não encontrado** e adicionar fotos opcionais ou uma foto de exemplo.
+- **Orçamento e chat:** enviar o resultado, conversar com o Cliente, responder a pedidos de ajuste, corrigir preços e reenviar o orçamento.
+- **Meu perfil e histórico:** consultar dados fictícios, avaliações recebidas e coletas concluídas. **Concluídas** reúne as coletas com recompensa confirmada, mesmo com avaliação pendente.
 
-### Coletar e enviar
+Nos dois perfis, também é possível testar as notificações internas e alternar entre **modo claro e modo escuro**. A interface se adapta a celular, tablet e computador.
 
-5. Use **Trocar para Colaborador** no topo e, na entrada, clique em **Sou Colaborador**, que estará destacado. O aplicativo abrirá o Dashboard em `#/inicio`. Use **Disponíveis** ou **Minhas coletas** e abra a solicitação criada.
-6. Aceite a tarefa. A recusa também pode ser demonstrada e encerra apenas a participação desse colaborador.
-7. Informe os preços **por unidade**, marque os produtos como conferidos e anexe fotos locais. Se preferir, use **foto de exemplo**, que cria uma evidência fictícia claramente marcada.
-8. Caso um produto não seja encontrado, marque **Não encontrado**. Ele ficará fora do total. A demonstração exige pelo menos um produto encontrado antes do envio.
-9. Clique em **Enviar orçamento**.
+## Como explorar o protótipo
 
-### Revisar, ajustar e concluir
+Na primeira visita, escolha **Iniciar demonstração** para seguir o guia ou **Não desejo participar do guia** para explorar pelo roteiro abaixo. **Sou Cliente** e **Sou Colaborador** abrem as contas de exemplo sem digitar senha.
 
-10. Troque para Cliente, confirme a escolha na tela de entrada e examine o orçamento e as fotos.
-11. Para testar a alternativa, escolha **Pedir ajuste**, escreva o motivo e clique em **Enviar pedido de ajuste**. Só esse envio registra a solicitação. Campo vazio ou apenas espaços é bloqueado. Voltar, sair, recarregar ou fechar antes de enviar não muda o status. Depois, troque de perfil pela entrada. No Dashboard do Colaborador, abra a coleta em andamento e use o chat para responder.
-12. No Colaborador, abra **Revisar itens**, corrija os preços e reenvie. O total visto pelo Cliente será atualizado.
-13. No Cliente, aprove o orçamento e confirme a recompensa **fictícia** definida na criação da solicitação (R$ 5,00 por padrão).
-14. Registre uma nota de 1 a 5 e um comentário opcional.
-15. Volte ao perfil Colaborador. No Início, o saldo será atualizado; abra **Concluídas** e a coleta para consultar o recebimento. Nenhuma transação real foi realizada.
+**Use o mesmo navegador durante o percurso.** Para mudar de papel, clique em **Trocar para Colaborador** ou **Trocar para Cliente**, no topo. Na tela de entrada, selecione o perfil indicado para continuar com a mesma solicitação.
 
-Também existem três pedidos iniciais: **Compra da semana** (disponível para coleta), **Despensa de casa** (orçamento pronto) e **Café da manhã** (concluído). Eles facilitam a avaliação sem precisar preencher todo o fluxo.
+### 1. Cliente: criar a solicitação
 
-## Área do Colaborador
+1. Entre como Cliente e, em **Visão geral**, clique em **Nova lista**.
+2. Dê um nome à lista. Preencha **Produto e embalagem**, **Quantidade** e **Unidade**, usando **Adicionar** para cada item. Experimente, por exemplo, arroz e leite.
+3. Clique em **Escolher local**, selecione o estabelecimento e avance em **Revisar solicitação**. Confira os itens, defina a recompensa fictícia e clique em **Confirmar solicitação**.
 
-O acesso por botão de demonstração, login ou troca guiada sempre leva o Colaborador a **`index.html#/inicio`**.
+### 2. Colaborador: coletar e enviar
 
-| Área | Função |
-| --- | --- |
-| Início | Visão geral: saudação, saldo fictício, ganhos em andamento, média das avaliações, contadores e prévias limitadas de coletas. |
-| Minhas coletas | Única listagem operacional completa, com busca e filtros Todas, Disponíveis, Em andamento e Concluídas. |
-| Meu perfil | Identidade fictícia, dados da conta, avaliações recebidas e atalho para o histórico de coletas. |
-| Guia da demonstração | Explicação do projeto e roteiro dos dois perfis. |
+1. Troque para Colaborador. Em **Início**, observe o resumo e acesse **Minhas coletas → Disponíveis**. Abra a coleta da lista criada e clique em **Aceitar e iniciar coleta**.
+2. Preencha os preços por unidade e marque **Item conferido**, ou indique **Não encontrado**. Todos os itens precisam estar resolvidos, com pelo menos um produto encontrado para permitir o envio.
+3. Se desejar, use **Anexar foto** ou **Usar foto de exemplo**. Confira o total e clique em **Enviar orçamento**. A recompensa fica separada do total dos produtos.
 
-**Minhas tarefas foi removida.** Não existe outra página de listagem com a mesma função. Um endereço antigo `#/tarefas` apenas redireciona para `#/coletas`, sem renderizar uma tela duplicada; nenhum botão ou link atual aponta para essa rota antiga.
+### 3. Cliente e Colaborador: revisar, ajustar e concluir
 
-### Indicadores calculados a partir das coletas
+1. Retorne ao Cliente, abra a lista em **Minhas listas** e confira o orçamento.
+2. Para testar uma correção, clique em **Pedir ajuste**, escreva o motivo e envie em **Enviar pedido de ajuste**. Apenas abrir a tela ou digitar sem enviar não registra a solicitação.
+3. Troque para Colaborador, abra a coleta em **Minhas coletas → Em andamento** e use **Conversar** para ler o motivo. No chat, clique em **Revisar itens**, corrija o preço e escolha **Reenviar orçamento**.
+4. Volte ao Cliente e confira a correção. Clique em **Aprovar orçamento** e confirme na janela apresentada. Se não quiser testar o ajuste, você pode aprovar diretamente na primeira revisão.
+5. Clique em **Confirmar recompensa fictícia**, escolha a nota e finalize em **Enviar avaliação e concluir**.
+6. Retorne ao Colaborador para conferir o saldo, a avaliação e a coleta em **Concluídas**.
 
-- **Disponíveis:** solicitações aguardando Colaborador, ainda não aceitas e não recusadas por esta conta.
-- **Em andamento:** coletas vinculadas a este Colaborador cuja recompensa ainda não foi confirmada. Inclui coleta, ajuste, orçamento enviado e orçamento aprovado aguardando confirmação da recompensa.
-- **Concluídas:** coletas deste Colaborador com recompensa confirmada. A avaliação pode ainda estar pendente; esse critério preserva o comportamento operacional anterior.
-- **Saldo disponível:** soma das recompensas fictícias confirmadas das coletas concluídas.
-- **Ganhos em andamento:** soma das recompensas das coletas aceitas ainda sem confirmação. Coletas apenas disponíveis e recompensas de outros colaboradores não entram nessa soma.
-- **Sua avaliação:** média das notas efetivamente registradas para este Colaborador, com duas casas decimais e quantidade de avaliações. Sem notas, aparece “—” e uma explicação.
+Para uma exploração rápida, o cenário inicial também oferece **Compra da semana** (disponível para coleta), **Despensa de casa** (orçamento pronto) e **Café da manhã** (concluída).
 
-O total dos produtos não é ganho do Colaborador. As somas das recompensas são feitas em centavos para evitar diferenças de arredondamento. No cenário inicial: saldo **R$ 5,00**, ganhos **R$ 5,00**, média **5,00** de uma avaliação, com **1 disponível, 1 em andamento e 1 concluída**. Esses números mudam conforme as ações na demonstração.
+## Guia interativo
 
-### Atalhos e filtros
+O guia opcional apresenta as áreas, destaca botões e campos e aguarda suas ações nas etapas práticas. Acompanha a mesma solicitação entre Cliente e Colaborador, da criação da lista à coleta, ajuste, aprovação e avaliação.
 
-| Atalho | Destino |
-| --- | --- |
-| Disponíveis / Ver todas da seção Coletas disponíveis | `#/coletas/disponiveis` |
-| Em andamento / Continuar / Acompanhar ganhos | `#/coletas/em-andamento` |
-| Concluídas / Consultar histórico no perfil | `#/coletas/concluidas` |
-| Minhas coletas / Ver todas do resumo | `#/coletas` — filtro Todas |
-| Ver avaliações | `#/perfil` |
+No celular, abre o menu lateral quando precisa destacar uma opção nele e ajusta o painel ao espaço disponível. Para interromper, clique em **Sair do guia** e confirme. Para continuar depois, acesse **Guia da demonstração → Retomar guia**.
 
-Os filtros fazem parte da rota: continuam corretos após F5, acesso direto e navegação pelo histórico do navegador. Ao chegar do Dashboard, uma busca anterior é limpa. Dentro da listagem, trocar o filtro preserva a busca atual.
+O progresso permanece após atualizar a página, se o navegador permitir salvar os dados. Para recomeçar, use **Meu perfil → Reiniciar dados de teste** ou **Reiniciar cenário de demonstração** na página do Guia. A confirmação apaga as alterações, restaura os exemplos e retorna à entrada, com o guia pronto para começar novamente.
 
-O Dashboard mostra até **duas coletas em andamento** e **duas disponíveis**. Ajustes e coletas em execução têm prioridade; dentro de cada prioridade, aparecem as atualizações mais recentes. As disponíveis são ordenadas pela criação mais recente. Os cards exibem estabelecimento, produtos/progresso, recompensa e acesso à ação adequada ao estado. O perfil mostra até cinco avaliações recentes; o histórico completo de coletas permanece na listagem.
+## Observações sobre o protótipo
 
-## O que significa tempo real neste protótipo
-
-- Ao alternar perfis no mesmo navegador, os dois visualizam os mesmos pedidos, preços, fotos e mensagens.
-- Em duas abas da **mesma origem e do mesmo navegador**, mudanças são refletidas pelo evento `storage`. Cada aba mantém seu próprio perfil ativo.
-- Para testar: abra duas abas do endereço publicado, entre em um perfil diferente em cada uma e abra a mesma solicitação.
-- **Não há sincronização entre computadores, celulares, navegadores diferentes ou janelas privativas separadas.** Cada um terá sua própria demonstração local.
-- Não existe backend, WebSocket, API, Firebase, banco de dados remoto nem autenticação real. A implementação de múltiplos usuários reais exigiria serviços adicionais e regras de segurança.
-- As notificações são internas à aplicação; não são notificações push do sistema.
-
-## Regras e escolhas adotadas
-
-- Os fluxos de Cliente e Colaborador seguem os materiais do PI II: lista, local, coleta, fotos, chat, ajustes, aprovação, recompensa simulada e avaliação.
-- **CotaJunto**, a identidade visual, as contas de exemplo, os campos detalhados, a escala de avaliação, o filtro de listas e o tratamento de itens não encontrados são escolhas recomendadas adotadas para a demonstração; não são novas exigências do professor.
-- Quantidade × preço unitário gera o subtotal; a soma dos produtos encontrados gera o total. A recompensa é separada e não entra no total dos produtos.
-- O limite de preço é **unitário e indicativo**. Um preço acima do limite gera um aviso, sem bloqueio automático.
-- Valores monetários têm até duas casas decimais. Digite `6,50` ou `6.50`, sem separador de milhar.
-- Fotos são opcionais. São aceitas imagens JPG, PNG e WebP de até 10 MB, reduzidas para no máximo 900 px na maior dimensão antes do armazenamento. Fotos são locais e não são enviadas a um servidor.
-- A foto de exemplo é uma ilustração fictícia do valor no momento em que foi criada. Se o preço for corrigido, substitua a evidência, como faria com uma foto real.
-- Ao recusar, o colaborador deixa de ver a tarefa; o Cliente continua aguardando um colaborador. A redistribuição automática não foi implementada. Reinicie o cenário para demonstrar essa tarefa novamente com a mesma conta.
-- Aprovação, recompensa e avaliação dependem do estado do pedido, evitando repetição indevida por retorno à tela.
-- A lógica de perfis é apenas de interface. Como todo o código e os dados estão no navegador, não existe isolamento seguro equivalente a um sistema de produção.
-
-## Aparência e identificação do perfil
-
-- O botão de sol/lua alterna entre **modo claro e modo escuro**, inclusive na entrada, cadastro, recuperação e guia. A escolha fica salva no navegador e é compartilhada entre abas da mesma origem.
-- O cabeçalho permanece no topo durante a rolagem. Em telas menores, seus controles se organizam em duas linhas.
-- **Área do Cliente** tem identificação em verde mais leve; **Área do Colaborador** usa um cabeçalho verde mais forte. O nome da área permanece visível nos dois temas.
-- A orientação de troca escurece o restante da entrada e destaca a opção de destino. O destaque termina ao selecionar o perfil, clicar em **Entendi**, pressionar **Escape**, clicar fora ou aguardar 15 segundos. Nenhuma dessas formas de dispensar a orientação entra automaticamente em uma conta.
-- A animação é desativada quando o navegador está configurado para reduzir movimentos.
-
-## Recompensa e ajustes
-
-O Cliente pode alterar a recompensa na etapa **Confirmar**, antes de criar a solicitação. O mínimo e padrão são **R$ 5,00**, conforme a possibilidade de aumentar o valor pedida nesta revisão. A validação aceita até duas casas decimais, vírgula ou ponto, sem separador de milhar, e usa o mesmo limite técnico dos campos monetários do protótipo (R$ 1.000.000,00). O valor é preservado no rascunho e exibido na coleta, aprovação e recebimento; permanece separado do total dos produtos. Depois da criação, ele não é editável.
-
-O motivo do ajuste e a mudança para **Ajuste solicitado** são salvos juntos. A mensagem fica identificada como **Motivo do pedido de ajuste** no chat. Uma conversa comum não muda o status. Se houver falha de armazenamento, nem o status nem a mensagem parcial são gravados, e o texto permanece para tentar novamente.
-
-Pedidos da versão anterior que ainda estejam em ajuste com o aviso antigo e sem uma mensagem posterior do Cliente voltam a **Orçamento pronto**, com uma explicação no histórico. Quando já existe uma justificativa, ela é preservada e identificada. Listas, itens e preços existentes são mantidos.
-
-## Persistência e reinício
-
-Os dados ficam em `localStorage`, sob a chave `cotajunto.v1`. O perfil ativo de cada aba fica em `sessionStorage`, sob `cotajunto.session`. O tema usa `cotajunto.theme`; a intenção de troca de perfil usa `cotajunto.switch-intent` apenas na aba atual. Fechar uma aba exige selecionar o perfil novamente, mas as listas permanecem no navegador, se o armazenamento estiver disponível.
-
-Em **Meu perfil → Reiniciar dados de teste**, o aplicativo pede confirmação antes de restaurar o cenário inicial. Esse comando remove apenas os dados do CotaJunto. Não apaga informações de outros sites.
-
-Se o armazenamento estiver bloqueado, o aplicativo informa que os dados permanecerão apenas na aba. Se o espaço local estiver cheio, uma mensagem orienta a remover fotos ou reiniciar. O protótipo não é adequado a grandes volumes de imagens nem a edição concorrente de produção.
-
-## Arquivos
-
-```text
-index.html          Entrada da aplicação
-styles.css          Estilos e regras responsivas
-appearance.css      Temas, identificação dos perfis, cabeçalho e orientação
-app.js              Telas, navegação, estados, regras e persistência local
-assets/logo.svg     Marca vetorial local
-.nojekyll           Publicação estática sem processamento Jekyll
-README.md           Instruções de uso e publicação
-VALIDACAO.md        Testes executados e limites da verificação
-ALTERACOES.md       Conferência dos 12 itens da organização do Colaborador
-```
-
-## Antes da entrega acadêmica
-
-- Abra o link publicado sem estar conectado ao GitHub.
-- Teste botões, rotas, retorno e recarregamento.
-- Percorra os dois perfis, inclusive recusa e ajuste.
-- Confira no celular, tablet e desktop.
-- Inclua a URL real e capturas da versão publicada no guia entregue ao professor.
-- Confirme integrantes atuais, prazo e demais documentos exigidos no AVA.
-- Registre eventual confirmação específica do professor sobre GitHub Pages. A rubrica aceita aplicativo navegável, mas o material consultado não documentava aprovação individual desta hospedagem.
-
-O site ainda **não foi publicado** por esta entrega de arquivos. A publicação e o teste da URL final devem seguir os passos acima.
+- **Tudo é demonstrativo:** contas, preços, recompensas e avaliações são fictícios. Não há compra de produtos, cobrança, transferência ou saque real.
+- **A pesquisa não é automática:** você informa os preços ao testar o Colaborador. Não existe consulta a estoque ou preços reais das lojas.
+- **A colaboração acontece neste navegador:** os perfis compartilham listas, fotos e mensagens. Duas abas do mesmo endereço e navegador podem refletir as atualizações; celulares, computadores ou navegadores diferentes mantêm demonstrações independentes.
+- **Os dados ficam salvos no navegador**, quando permitido. Apagar os dados do site ou reiniciar o cenário remove as alterações dos testes.
+- **O acesso é simulado:** cadastro, recuperação de senha e botão Google não oferecem autenticação real. Use somente dados e imagens fictícios.
